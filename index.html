@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#718875">
+  <meta name="description" content="Toutes mes collections au même endroit.">
+  <title>Ma Collection</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-mark">♡</div>
+    <div><p class="eyebrow">MON PETIT UNIVERS</p><h1>Ma Collection</h1></div>
+    <button id="restoreBtn" class="icon-button" aria-label="Restaurer une sauvegarde" title="Restaurer">↧</button><button id="backupBtn" class="icon-button" aria-label="Sauvegarder" title="Sauvegarder">↥</button>
+  </header>
+
+  <main>
+    <section id="homeView">
+      <div class="intro">
+        <div><p class="eyebrow">BIENVENUE</p><h2>Toutes mes collections<br>au même endroit ♡</h2></div>
+        <div class="intro-flower" aria-hidden="true">✿</div>
+      </div>
+      <div class="section-heading"><div><p class="eyebrow">MON ESPACE</p><h2>Mes collections</h2></div><span id="collectionCount" class="count-pill">0 liste</span></div>
+      <div id="collectionGrid" class="collection-grid"></div>
+      <button id="newCollectionBtn" class="primary-button full-button"><span>＋</span> Créer une collection</button>
+      <p class="privacy-note">☘ Tes listes sont enregistrées sur cet appareil.</p>
+    </section>
+
+    <section id="detailView" class="hidden">
+      <button id="backBtn" class="back-button">← Toutes mes collections</button>
+      <div class="detail-header">
+        <div><p class="eyebrow">MA COLLECTION</p><h2 id="detailTitle"></h2><p id="detailSubtitle" class="muted"></p></div>
+        <button id="editCollectionBtn" class="soft-button" aria-label="Modifier la collection">✎</button>
+      </div>
+      <div class="progress-card">
+        <div class="progress-top"><span>Ma progression</span><strong id="progressPercent">0 %</strong></div>
+        <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+        <p id="progressText" class="muted">0 élément trouvé sur 0</p>
+      </div>
+      <div class="section-heading compact"><div><p class="eyebrow">MA LISTE</p><h2>À trouver</h2></div><button id="deleteCollectionBtn" class="text-button danger">Supprimer la liste</button></div>
+      <div id="itemsList" class="items-list"></div>
+      <button id="newItemBtn" class="primary-button full-button"><span>＋</span> Ajouter un élément</button>
+    </section>
+  </main>
+
+  <footer>Fait avec soin, pour mes collections ♡</footer>
+
+  <dialog id="collectionDialog">
+    <form id="collectionForm" method="dialog">
+      <div class="dialog-heading"><div><p class="eyebrow">PERSONNALISER</p><h2 id="collectionDialogTitle">Nouvelle collection</h2></div><button type="button" class="close-button" data-close="collectionDialog">×</button></div>
+      <label for="collectionName">Nom de la collection</label>
+      <input id="collectionName" maxlength="50" placeholder="Ex. Mes figurines" required>
+      <label for="collectionEmoji">Choisir un symbole</label>
+      <div id="emojiChoices" class="emoji-choices">
+        <button type="button" class="emoji-choice selected">💎</button><button type="button" class="emoji-choice">📚</button><button type="button" class="emoji-choice">🧸</button><button type="button" class="emoji-choice">🃏</button><button type="button" class="emoji-choice">🦴</button><button type="button" class="emoji-choice">🌿</button><button type="button" class="emoji-choice">🎀</button><button type="button" class="emoji-choice">✨</button>
+      </div>
+      <input id="collectionEmoji" type="hidden" value="💎">
+      <div class="dialog-actions"><button type="button" class="soft-button" data-close="collectionDialog">Annuler</button><button class="primary-button" type="submit">Enregistrer</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="itemDialog">
+    <form id="itemForm" method="dialog">
+      <div class="dialog-heading"><div><p class="eyebrow">MA LISTE</p><h2 id="itemDialogTitle">Ajouter un élément</h2></div><button type="button" class="close-button" data-close="itemDialog">×</button></div>
+      <label for="itemName">Nom de l'élément</label>
+      <input id="itemName" maxlength="100" placeholder="Ex. Figurine n° 12" required>
+      <label for="itemNote">Petite note (facultatif)</label>
+      <textarea id="itemNote" rows="3" maxlength="250" placeholder="Édition spéciale, couleur, référence…"></textarea>
+      <div class="dialog-actions"><button type="button" class="soft-button" data-close="itemDialog">Annuler</button><button class="primary-button" type="submit">Enregistrer</button></div>
+    </form>
+  </dialog>
+  <input id="restoreFile" type="file" accept="application/json,.json" hidden>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

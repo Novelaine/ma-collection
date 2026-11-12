@@ -1,0 +1,14 @@
+{
+  "name": "Ma Collection",
+  "short_name": "Ma Collection",
+  "description": "Toutes mes collections au même endroit.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#faf8f2",
+  "theme_color": "#718875",
+  "icons": [
+    {"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
