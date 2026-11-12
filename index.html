@@ -14,18 +14,22 @@
   <header class="topbar">
     <div class="brand-mark">♡</div>
     <div><p class="eyebrow">MON PETIT UNIVERS</p><h1>Ma Collection</h1></div>
-    <button id="restoreBtn" class="icon-button" aria-label="Restaurer une sauvegarde" title="Restaurer">↧</button><button id="backupBtn" class="icon-button" aria-label="Sauvegarder" title="Sauvegarder">↥</button>
+    <div class="backup-actions"><button id="backupBtn" class="icon-button" aria-label="Sauvegarder" title="Sauvegarder">↥</button><button id="restoreBtn" class="icon-button" aria-label="Restaurer une sauvegarde" title="Restaurer une sauvegarde">↧</button></div>
   </header>
 
   <main>
     <section id="homeView">
       <div class="intro">
-        <div><p class="eyebrow">BIENVENUE</p><h2>Toutes mes collections<br>au même endroit ♡</h2></div>
+        <div><p class="eyebrow">BIENVENUE</p><h2>Toutes mes collections au même endroit ♡</h2></div>
         <div class="intro-flower" aria-hidden="true">✿</div>
       </div>
       <div class="section-heading"><div><p class="eyebrow">MON ESPACE</p><h2>Mes collections</h2></div><span id="collectionCount" class="count-pill">0 liste</span></div>
       <div id="collectionGrid" class="collection-grid"></div>
       <button id="newCollectionBtn" class="primary-button full-button"><span>＋</span> Créer une collection</button>
+      <section class="pokemon-home-card">
+        <div class="pokemon-home-copy"><p class="eyebrow">ESPACE SPÉCIALISÉ</p><h2>🃏 Collection Pokémon</h2><p>Retrouve les cartes, gère tes différentes finitions et tes recherches.</p></div>
+        <button id="openPokemonBtn" class="soft-button">Ouvrir mon espace Pokémon →</button>
+      </section>
       <p class="privacy-note">☘ Tes listes sont enregistrées sur cet appareil.</p>
     </section>
 
@@ -43,6 +47,54 @@
       <div class="section-heading compact"><div><p class="eyebrow">MA LISTE</p><h2>À trouver</h2></div><button id="deleteCollectionBtn" class="text-button danger">Supprimer la liste</button></div>
       <div id="itemsList" class="items-list"></div>
       <button id="newItemBtn" class="primary-button full-button"><span>＋</span> Ajouter un élément</button>
+    </section>
+
+    <section id="pokemonView" class="hidden">
+      <button id="pokemonBackBtn" class="back-button">← Toutes mes collections</button>
+      <div class="detail-header pokemon-title-row"><div><p class="eyebrow">CATALOGUE DE CARTES</p><h2>🃏 Pokémon</h2><p class="muted">Choisis une langue, recherche une carte et ajoute ses différentes versions.</p></div></div>
+      <div class="pokemon-list-tabs" role="group" aria-label="Navigation Pokémon">
+        <button id="showPokemonSearch" class="pokemon-list-tab active" type="button">⌕ Recherche</button>
+        <button id="showOwnedPokemon" class="pokemon-list-tab" type="button">Possédées <span id="pokemonOwnedCount">0</span></button>
+        <button id="showWantedPokemon" class="pokemon-list-tab" type="button">À trouver <span id="pokemonWantedCount">0</span></button>
+      </div>
+
+      <div id="pokemonSearchPanel">
+        <div class="language-tabs" role="group" aria-label="Langue du catalogue">
+          <button class="language-tab active" data-language="fr" type="button">🇫🇷 Français</button>
+          <button class="language-tab" data-language="en" type="button">🇬🇧 Anglais</button>
+          <button class="language-tab" data-language="ja" type="button">🇯🇵 Japonais</button>
+        </div>
+        <div class="pokemon-search-card">
+          <label for="pokemonSearch">Nom de la carte</label>
+          <input id="pokemonSearch" type="search" placeholder="Ex. Pikachu, Dracaufeu…" autocomplete="off">
+          <div class="pokemon-filter-grid">
+            <div><label for="pokemonSetFilter">Extension (facultatif)</label><input id="pokemonSetFilter" placeholder="Ex. Base, Évolutions…"></div>
+            <div><label for="pokemonNumberFilter">Numéro (facultatif)</label><input id="pokemonNumberFilter" placeholder="Ex. 25"></div>
+          </div>
+          <button id="pokemonSearchBtn" class="primary-button full-button">Rechercher dans le catalogue</button>
+          <p class="api-note">Le catalogue TCGdex nécessite une connexion Internet. Tes listes personnelles restent enregistrées sur cet appareil.</p>
+        </div>
+        <div class="section-heading compact"><div><p class="eyebrow">CATALOGUE</p><h2>Résultats</h2></div><span id="pokemonResultCount" class="count-pill">0 carte</span></div>
+        <div id="pokemonResults" class="pokemon-results"><div class="empty-state">Recherche une carte pour commencer ♡</div></div>
+        <section id="pokemonSelected" class="pokemon-selected hidden">
+          <div class="selected-card-heading"><h3 id="selectedCardName"></h3><button id="closeSelectedCard" class="mini-button" aria-label="Fermer">×</button></div>
+          <div id="selectedCardMeta" class="muted"></div>
+          <div class="selected-card-layout"><img id="selectedCardImage" alt="Illustration de la carte Pokémon"><div class="selected-card-controls">
+            <label for="pokemonVariant">Finition / version</label><select id="pokemonVariant"></select>
+            <label for="pokemonCustomVariant">Autre finition (facultatif)</label><input id="pokemonCustomVariant" maxlength="40" placeholder="Ex. Holo cosmos">
+            <label for="pokemonOwnedQty">Quantité possédée</label><input id="pokemonOwnedQty" type="number" min="0" max="999" value="0">
+            <label class="wanted-toggle"><input id="pokemonWanted" type="checkbox"> Je recherche cette version</label>
+            <button id="savePokemonVersion" class="primary-button full-button">Enregistrer cette version</button>
+          </div></div>
+          <div class="section-heading compact owned-heading"><div><p class="eyebrow">CETTE CARTE</p><h3>Mes versions enregistrées</h3></div></div>
+          <div id="selectedCardVersions" class="version-list"></div>
+        </section>
+      </div>
+
+      <div id="pokemonRecordPanel" class="pokemon-record-panel hidden">
+        <div id="pokemonOwnedList" class="pokemon-record-list hidden"></div>
+        <div id="pokemonWantedList" class="pokemon-record-list hidden"></div>
+      </div>
     </section>
   </main>
 
@@ -75,5 +127,6 @@
   <input id="restoreFile" type="file" accept="application/json,.json" hidden>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="app.js"></script>
+  <script src="pokemon.js"></script>
 </body>
 </html>

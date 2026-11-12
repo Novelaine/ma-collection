@@ -43,7 +43,7 @@ function renderHome() {
       <span class="collection-emoji">${escapeHtml(c.emoji)}</span>
       <span class="collection-name">${escapeHtml(c.name)}</span>
       <span class="collection-meta">${done} trouvé${done>1?"s":""} · ${Math.max(0,total-done)} restant${total-done>1?"s":""}</span>
-      <span class="card-progress"><span style="width:${pct}%"></span></span>
+      <span class="card-progress"><span style="width:${pct}%;height:4px"></span></span>
     </button>`;
   }).join("");
   grid.querySelectorAll("[data-open]").forEach(btn => btn.addEventListener("click", () => { activeId = btn.dataset.open; render(); }));
@@ -98,9 +98,30 @@ $("emojiChoices").addEventListener("click", e => {
 });
 $("collectionForm").addEventListener("submit", e => {
   e.preventDefault(); const name = $("collectionName").value.trim(); if (!name) return;
-  if (editingCollectionId) { const c=collections.find(x=>x.id===editingCollectionId); c.name=name; c.emoji=$("collectionEmoji").value; }
-  else { const c={id:uid(),name,emoji:$("collectionEmoji").value,items:[]}; collections.push(c); activeId=c.id; }
-  save(); $("collectionDialog").close(); render(); showToast("Collection enregistrée ♡");
+  const existingCollection = editingCollectionId
+    ? collections.find(x => x.id === editingCollectionId)
+    : null;
+
+  if (existingCollection) {
+    existingCollection.name = name;
+    existingCollection.emoji = $("collectionEmoji").value;
+  } else {
+    // Aucune limite de nombre : chaque nouvelle collection reçoit son propre identifiant.
+    collections.push({
+      id: uid(),
+      name,
+      emoji: $("collectionEmoji").value,
+      items: []
+    });
+    // Après création, revenir systématiquement à l'accueil.
+    activeId = null;
+  }
+
+  editingCollectionId = null;
+  save();
+  $("collectionDialog").close();
+  render();
+  showToast("Collection enregistrée ♡");
 });
 $("itemForm").addEventListener("submit", e => {
   e.preventDefault(); const name=$("itemName").value.trim(); if (!name) return;
@@ -121,19 +142,25 @@ $("deleteCollectionBtn").addEventListener("click", () => {
 });
 document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",()=>$(b.dataset.close).close()));
 $("backupBtn").addEventListener("click", () => {
-  if (!collections.length) { showToast("Aucune collection à sauvegarder pour le moment."); return; }
-  const blob=new Blob([JSON.stringify({app:"Ma Collection",version:1,exportedAt:new Date().toISOString(),collections},null,2)],{type:"application/json"});
+  const hasPokemonCards = window.getPokemonBackupData && window.getPokemonBackupData().length > 0;
+  if (!collections.length && !hasPokemonCards) { showToast("Aucune collection à sauvegarder pour le moment."); return; }
+  const backupData={app:"Ma Collection",version:2,exportedAt:new Date().toISOString(),collections};
+  if (window.getPokemonBackupData) backupData.pokemonCards=window.getPokemonBackupData();
+  const blob=new Blob([JSON.stringify(backupData,null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob), a=document.createElement("a"); a.href=url; a.download="ma-collection-sauvegarde.json"; a.click(); URL.revokeObjectURL(url);
   showToast("Sauvegarde téléchargée ♡");
 });
-$("restoreBtn").addEventListener("click",()=>$("restoreFile").click());
+$("restoreBtn").addEventListener("click", () => $("restoreFile").click());
 $("restoreFile").addEventListener("change",async e=>{
   const file=e.target.files[0]; if(!file)return;
   try{
     const data=JSON.parse(await file.text());
     if(!Array.isArray(data.collections)||!data.collections.every(c=>typeof c.name==="string"&&Array.isArray(c.items))) throw new Error();
     if(!confirm("Remplacer les collections actuelles par celles de cette sauvegarde ?")) return;
-    collections=data.collections; save(); activeId=null; render(); showToast("Sauvegarde restaurée ♡");
+    collections=data.collections; save();
+    // Les anciennes sauvegardes ne contiennent pas pokemonCards : on conserve alors les données Pokémon actuelles.
+    if (Array.isArray(data.pokemonCards) && window.restorePokemonBackupData) window.restorePokemonBackupData(data.pokemonCards);
+    activeId=null; render(); showToast("Sauvegarde restaurée ♡");
   }catch{alert("Ce fichier ne semble pas être une sauvegarde valide de Ma Collection.");}
   finally{e.target.value="";}
 });
