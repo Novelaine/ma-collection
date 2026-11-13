@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 336">
+<rect x="4" y="4" width="232" height="328" rx="18" fill="#e8eee6" stroke="#718875" stroke-width="8"/>
+<rect x="18" y="18" width="204" height="300" rx="13" fill="#718875"/>
+<circle cx="120" cy="168" r="76" fill="#faf8f2" stroke="#526b57" stroke-width="8"/>
+<circle cx="120" cy="168" r="49" fill="#d9e4d7" stroke="#526b57" stroke-width="7"/>
+<path d="M44 78 Q120 20 196 78 M44 258 Q120 316 196 258" fill="none" stroke="#faf8f2" stroke-width="8" stroke-linecap="round"/>
+<text x="120" y="177" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="#526b57">TCG</text>
+</svg>
