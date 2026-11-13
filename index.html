@@ -58,7 +58,15 @@
 
 		<section id="pokemonView" class="hidden">
 			<button id="pokemonBackBtn" class="back-button">← Toutes mes collections</button>
-			<div class="detail-header pokemon-title-row"><div><p class="eyebrow">CATALOGUE DE CARTES</p><h2>🃏 Pokémon</h2><p class="muted">Choisis une langue, recherche une carte et ajoute ses différentes versions.</p></div></div>
+			<div class="detail-header pokemon-title-row">
+        <div>
+          <p class="eyebrow">CATALOGUE DE CARTES</p>
+          <div class="item-actions">
+          <img src="icons/pokemon-card-back.jpg" alt="">
+          <h2>Pokémon</h2>
+          </div>
+          <p class="muted">Choisis une langue, recherche une carte et ajoute ses différentes versions.</p>
+        </div></div>
 			<div class="pokemon-list-tabs" role="group" aria-label="Navigation Pokémon">
 				<button id="showPokemonSearch" class="pokemon-list-tab active" type="button">⌕ Recherche</button>
 				<button id="showOwnedPokemon" class="pokemon-list-tab" type="button">Possédées <span id="pokemonOwnedCount">0</span></button>
