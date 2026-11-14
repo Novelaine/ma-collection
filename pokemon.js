@@ -100,12 +100,12 @@ function getRecord(cardId, language, variant) {
 	return pokemonRecords.find(r => recordKey(r) === recordKey({cardId, language, variant}));
 }
 function cardImage(url, quality = "low") {
-	return url ? `${url}/${quality}.png` : "./icons/pokemon-card-back.svg";
+	return url ? `${url}/${quality}.png` : "./icons/pokemon-card-back.jpg";
 }
 function applyCardImageFallback(image) {
 	image.onerror = () => {
 		image.onerror = null;
-		image.src = "./icons/pokemon-card-back.svg";
+		image.src = "./icons/pokemon-card-back.jpg";
 	};
 }
 function showPokemonDetail() {
