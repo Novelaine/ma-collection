@@ -68,8 +68,10 @@ function renderDetail() {
 	$("showAllItems").classList.toggle("active", collectionItemView === "all");
 	$("showOwnedItems").classList.toggle("active", collectionItemView === "owned");
 	if (!sorted.length) { list.innerHTML = `<div class="empty-state">${collectionItemView === "owned" ? "Tu n'as pas encore d'objet dans tes possessions." : "Ta liste est vide pour le moment."}<br>Ajoute un élément pour commencer ♡</div>`; return; }
-	list.innerHTML = sorted.map(item => `<div class="item-row ${item.done?"done":""}" data-item-detail="${item.id}">
-		<input class="item-check" type="checkbox" aria-label="Marquer ${escapeHtml(item.name)} comme trouvé" data-check="${item.id}" ${item.done?"checked":""}>
+	// Dans « En ma possession », on affiche les objets normalement :
+	// pas de case à cocher, pas de style grisé ou barré.
+	list.innerHTML = sorted.map(item => `<div class="item-row ${collectionItemView === "owned" ? "owned-item" : item.done ? "done" : ""}" data-item-detail="${item.id}">
+		${collectionItemView === "owned" ? "" : `<input class="item-check" type="checkbox" aria-label="Marquer ${escapeHtml(item.name)} comme trouvé" data-check="${item.id}" ${item.done?"checked":""}>`}
 		${item.photo ? `<img class="item-row-photo" src="${escapeHtml(item.photo)}" alt="Photo de ${escapeHtml(item.name)}">` : `<span class="item-row-photo item-photo-placeholder">♡</span>`}
 		<div class="item-copy"><div class="item-name">${escapeHtml(item.name)}</div>${item.note?`<div class="item-note">${escapeHtml(item.note)}</div>`:""}</div>
 		<div class="item-actions"><button class="mini-button" data-edit="${item.id}" aria-label="Modifier">✎</button><button class="mini-button" data-delete="${item.id}" aria-label="Supprimer">×</button></div>
