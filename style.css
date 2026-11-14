@@ -157,7 +157,7 @@ main {
 }
 .card-progress span {
 	height:100%;
-    height: 4px;
+	height: 4px;
 	display:block;
 	background:var(--sage);
 	border-radius:9px
@@ -181,7 +181,7 @@ main {
 .full-button {
 	width:100%;
 	min-height:49px;
-    margin-top: 20px
+	margin-top: 20px
 }
 .full-button span {
 	font-size:20px;
@@ -302,7 +302,7 @@ main {
 .item-actions {
 	display:flex;
 	gap:3px;
-    align-items: center;
+	align-items: center;
 }
 .item-actions img{
 	width: 8%;
@@ -863,6 +863,135 @@ textarea {
 	padding: 10px 12px;
 	border-radius: 12px;
 	background: #fffefa;
+	color: var(--muted);
+	font-size: 11px;
+}
+
+
+/* V6 — fiches détaillées et affichage visuel des cartes */
+.collection-view-tabs {
+	display: flex;
+	gap: 8px;
+	margin: 12px 0;
+}
+.collection-view-tab {
+	border: 1px solid var(--line);
+	border-radius: 30px;
+	padding: 9px 13px;
+	background: var(--white);
+	color: var(--ink);
+	font: inherit;
+	font-size: 11px;
+	cursor: pointer;
+}
+.collection-view-tab.active {
+	background: var(--sage-pale);
+	border-color: var(--sage);
+	color: var(--sage-dark);
+	font-weight: 700;
+}
+.item-row {
+	cursor: pointer;
+}
+.item-photo-placeholder {
+	display: grid;
+	place-items: center;
+	background: var(--sage-pale);
+	color: var(--sage-dark);
+	font-size: 22px;
+}
+.item-details-photo {
+	display: block;
+	width: min(100%, 320px);
+	max-height: 320px;
+	object-fit: contain;
+	margin: 12px auto;
+	border-radius: 14px;
+}
+.item-details-note {
+	white-space: pre-wrap;
+	line-height: 1.6;
+}
+.pokemon-results {
+	grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+	gap: 12px;
+}
+.pokemon-result-image-only {
+	display: block;
+	width: 100%;
+	padding: 5px;
+	border-radius: 12px;
+	background: transparent;
+	border: 0;
+}
+.pokemon-result-image-only img {
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 2.5 / 3.5;
+	object-fit: contain;
+	border-radius: 9px;
+	box-shadow: 0 2px 8px #00000018;
+}
+.pokemon-record-list {
+	grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+	gap: 12px;
+}
+.pokemon-record-image-only {
+	display: block;
+	width: 100%;
+	padding: 4px;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+}
+.pokemon-record-image-only img {
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 2.5 / 3.5;
+	object-fit: contain;
+	border-radius: 9px;
+	box-shadow: 0 2px 8px #00000018;
+}
+.selected-card-info {
+	min-width: 0;
+}
+.selected-card-details {
+	font-size: 12px;
+	line-height: 1.5;
+	margin-bottom: 12px;
+	overflow-wrap: anywhere;
+}
+.selected-card-details p {
+	margin: 4px 0;
+}
+.selected-card-controls {
+	margin-top: 16px;
+	padding-top: 14px;
+	border-top: 1px solid var(--line);
+}
+@media (max-width: 390px) {
+	.pokemon-results {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+	.pokemon-record-list {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+.saved-version-detail {
+	padding: 10px 12px;
+	border: 1px solid var(--line);
+	border-radius: 11px;
+	background: var(--white);
+}
+.saved-version-detail span {
+	display: grid;
+	gap: 4px;
+	font-size: 12px;
+}
+.saved-version-detail small {
 	color: var(--muted);
 	font-size: 11px;
 }

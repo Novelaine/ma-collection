@@ -5,6 +5,8 @@ let editingCollectionId = null;
 let editingItemId = null;
 let toastTimer;
 let pendingItemPhoto = "";
+let collectionItemView = "all";
+let selectedDetailItemId = null;
 
 const $ = (id) => document.getElementById(id);
 const homeView = $("homeView");
@@ -47,7 +49,7 @@ function renderHome() {
 			<span class="card-progress"><span style="width:${pct}%"></span></span>
 		</button>`;
 	}).join("");
-	grid.querySelectorAll("[data-open]").forEach(btn => btn.addEventListener("click", () => { activeId = btn.dataset.open; render(); }));
+	grid.querySelectorAll("[data-open]").forEach(btn => btn.addEventListener("click", () => { activeId = btn.dataset.open; collectionItemView = "all"; render(); }));
 }
 function renderDetail() {
 	const c = getActive(); if (!c) return render();
@@ -60,19 +62,42 @@ function renderDetail() {
 	$("progressText").textContent = `${done} élément${done>1?"s":""} trouvé${done>1?"s":""} sur ${total}`;
 	const list = $("itemsList");
 	if (!total) { list.innerHTML = '<div class="empty-state">Ta liste est vide pour le moment.<br>Ajoute le premier élément à rechercher ♡</div>'; return; }
-	const sorted = [...c.items].sort((a,b) => Number(a.done)-Number(b.done));
-	list.innerHTML = sorted.map(item => `<div class="item-row ${item.done?"done":""}">
+	const visibleItems = collectionItemView === "owned" ? c.items.filter(item => item.done) : c.items;
+	const sorted = [...visibleItems].sort((a,b) => Number(a.done)-Number(b.done));
+	$("itemsHeading").textContent = collectionItemView === "owned" ? "En ma possession" : "À trouver et possédés";
+	$("showAllItems").classList.toggle("active", collectionItemView === "all");
+	$("showOwnedItems").classList.toggle("active", collectionItemView === "owned");
+	if (!sorted.length) { list.innerHTML = `<div class="empty-state">${collectionItemView === "owned" ? "Tu n'as pas encore d'objet dans tes possessions." : "Ta liste est vide pour le moment."}<br>Ajoute un élément pour commencer ♡</div>`; return; }
+	list.innerHTML = sorted.map(item => `<div class="item-row ${item.done?"done":""}" data-item-detail="${item.id}">
 		<input class="item-check" type="checkbox" aria-label="Marquer ${escapeHtml(item.name)} comme trouvé" data-check="${item.id}" ${item.done?"checked":""}>
-		${item.photo ? `<img class="item-row-photo" src="${escapeHtml(item.photo)}" alt="Photo de ${escapeHtml(item.name)}">` : ""}
+		${item.photo ? `<img class="item-row-photo" src="${escapeHtml(item.photo)}" alt="Photo de ${escapeHtml(item.name)}">` : `<span class="item-row-photo item-photo-placeholder">♡</span>`}
 		<div class="item-copy"><div class="item-name">${escapeHtml(item.name)}</div>${item.note?`<div class="item-note">${escapeHtml(item.note)}</div>`:""}</div>
 		<div class="item-actions"><button class="mini-button" data-edit="${item.id}" aria-label="Modifier">✎</button><button class="mini-button" data-delete="${item.id}" aria-label="Supprimer">×</button></div>
 	</div>`).join("");
+	list.querySelectorAll("[data-item-detail]").forEach(row => row.addEventListener("click", event => { if (event.target.closest("button,input")) return; openItemDetails(row.dataset.itemDetail); }));
 	list.querySelectorAll("[data-check]").forEach(el => el.addEventListener("change", () => {
 		const item = c.items.find(i => i.id === el.dataset.check); if (item) { item.done = el.checked; save(); renderDetail(); }
 	}));
 	list.querySelectorAll("[data-edit]").forEach(el => el.addEventListener("click", () => openItemDialog(el.dataset.edit)));
 	list.querySelectorAll("[data-delete]").forEach(el => el.addEventListener("click", () => deleteItem(el.dataset.delete)));
 }
+
+function openItemDetails(id) {
+	const item = getActive()?.items.find(entry => entry.id === id);
+	if (!item) return;
+	selectedDetailItemId = id;
+	$("itemDetailsTitle").textContent = item.name;
+	$("itemDetailsNote").textContent = item.note || "Aucun renseignement supplémentaire.";
+	$("itemDetailsStatus").textContent = item.done ? "✓ Dans mes possessions" : "À trouver";
+	$("itemDetailsPhoto").src = item.photo || "";
+	$("itemDetailsPhoto").classList.toggle("hidden", !item.photo);
+	$("itemDetailsDialog").showModal();
+}
+$("itemDetailsEdit").addEventListener("click", () => {
+	$("itemDetailsDialog").close();
+	if (selectedDetailItemId) openItemDialog(selectedDetailItemId);
+});
+
 function openCollectionDialog(id=null) {
 	editingCollectionId = id;
 	const c = id ? collections.find(x=>x.id===id) : null;
@@ -97,7 +122,9 @@ function openItemDialog(id=null) {
 $("newCollectionBtn").addEventListener("click", () => openCollectionDialog());
 $("editCollectionBtn").addEventListener("click", () => openCollectionDialog(activeId));
 $("newItemBtn").addEventListener("click", () => openItemDialog());
-$("backBtn").addEventListener("click", () => { activeId = null; render(); });
+$("showAllItems").addEventListener("click", () => { collectionItemView = "all"; renderDetail(); });
+$("showOwnedItems").addEventListener("click", () => { collectionItemView = "owned"; renderDetail(); });
+$("backBtn").addEventListener("click", () => { activeId = null; collectionItemView = "all"; render(); });
 $("emojiChoices").addEventListener("click", e => {
 	const b = e.target.closest(".emoji-choice"); if (!b) return;
 	$("collectionEmoji").value = b.textContent;

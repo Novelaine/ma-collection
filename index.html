@@ -28,13 +28,13 @@
 			<button id="newCollectionBtn" class="primary-button full-button"><span>＋</span> Créer une collection</button>
 			<section class="pokemon-home-card">
 				<div class="pokemon-home-copy">
-          <p class="eyebrow">ESPACE SPÉCIALISÉ</p>
-          <div class="item-actions">
-            <img src="icons/pokemon-card-back.jpg" alt="">
-            <h2>Collection Pokémon</h2>
-            <p>Retrouve les cartes, gère tes différentes finitions et tes recherches.</p>
-          </div>
-        </div>
+					<p class="eyebrow">ESPACE SPÉCIALISÉ</p>
+					<div class="item-actions">
+						<img src="icons/pokemon-card-back.jpg" alt="">
+						<h2>Collection Pokémon</h2>
+						<p>Retrouve les cartes, gère tes différentes finitions et tes recherches.</p>
+					</div>
+				</div>
 				<button id="openPokemonBtn" class="soft-button">Ouvrir mon espace Pokémon →</button>
 			</section>
 			<p class="privacy-note">☘ Tes listes sont enregistrées sur cet appareil.</p>
@@ -51,7 +51,8 @@
 				<div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
 				<p id="progressText" class="muted">0 élément trouvé sur 0</p>
 			</div>
-			<div class="section-heading compact"><div><p class="eyebrow">MA LISTE</p><h2>À trouver</h2></div><button id="deleteCollectionBtn" class="text-button danger">Supprimer la liste</button></div>
+			<div class="section-heading compact"><div><p class="eyebrow">MA LISTE</p><h2 id="itemsHeading">À trouver et possédés</h2></div><button id="deleteCollectionBtn" class="text-button danger">Supprimer la liste</button></div>
+			<div class="collection-view-tabs"><button id="showAllItems" class="collection-view-tab active" type="button">Toute la liste</button><button id="showOwnedItems" class="collection-view-tab" type="button">✓ En ma possession</button></div>
 			<div id="itemsList" class="items-list"></div>
 			<button id="newItemBtn" class="primary-button full-button"><span>＋</span> Ajouter un élément</button>
 		</section>
@@ -59,14 +60,14 @@
 		<section id="pokemonView" class="hidden">
 			<button id="pokemonBackBtn" class="back-button">← Toutes mes collections</button>
 			<div class="detail-header pokemon-title-row">
-        <div>
-          <p class="eyebrow">CATALOGUE DE CARTES</p>
-          <div class="item-actions">
-          <img src="icons/pokemon-card-back.jpg" alt="">
-          <h2>Pokémon</h2>
-          </div>
-          <p class="muted">Choisis une langue, recherche une carte et ajoute ses différentes versions.</p>
-        </div></div>
+				<div>
+					<p class="eyebrow">CATALOGUE DE CARTES</p>
+					<div class="item-actions">
+						<img src="icons/pokemon-card-back.jpg" alt="">
+						<h2>Pokémon</h2>
+					</div>
+					<p class="muted">Choisis une langue, recherche une carte et ajoute ses différentes versions.</p>
+				</div></div>
 			<div class="pokemon-list-tabs" role="group" aria-label="Navigation Pokémon">
 				<button id="showPokemonSearch" class="pokemon-list-tab active" type="button">⌕ Recherche</button>
 				<button id="showOwnedPokemon" class="pokemon-list-tab" type="button">Possédées <span id="pokemonOwnedCount">0</span></button>
@@ -82,6 +83,7 @@
 				<div class="pokemon-search-card">
 					<label for="pokemonSearch">Nom de la carte</label>
 					<input id="pokemonSearch" type="search" placeholder="Ex. Pikachu, Dracaufeu…" autocomplete="off">
+					<label for="pokemonIllustratorFilter">Illustrateur (facultatif)</label><input id="pokemonIllustratorFilter" type="search" placeholder="Ex. Mitsuhiro Arita" autocomplete="off">
 					<div class="pokemon-filter-grid">
 						<div><label for="pokemonSetFilter">Extension (facultatif)</label><input id="pokemonSetFilter" placeholder="Ex. Base, Évolutions…"></div>
 						<div><label for="pokemonNumberFilter">Numéro (facultatif)</label><input id="pokemonNumberFilter" placeholder="Ex. 25"></div>
@@ -99,7 +101,8 @@
 					<section id="pokemonSelected" class="pokemon-selected">
 					<div class="selected-card-heading"><h3 id="selectedCardName"></h3><button id="closeSelectedCard" class="mini-button" aria-label="Fermer">×</button></div>
 					<div id="selectedCardMeta" class="muted"></div>
-					<div class="selected-card-layout"><img id="selectedCardImage" alt="Illustration de la carte Pokémon"><div class="selected-card-controls">
+					<div class="selected-card-layout"><img id="selectedCardImage" alt="Illustration de la carte Pokémon"><div class="selected-card-info"><div id="selectedCardDetails" class="selected-card-details"></div><button id="showPokemonAddForm" class="primary-button full-button" type="button">＋ Ajouter à mes listes</button></div></div>
+					<div id="pokemonAddForm" class="selected-card-controls hidden">
 						<label for="pokemonVariant">Finition / version</label><select id="pokemonVariant"></select>
 						<label for="pokemonCustomVariant">Autre finition (facultatif)</label><input id="pokemonCustomVariant" maxlength="40" placeholder="Ex. Holo cosmos">
 						<label for="pokemonOwnedCategory">Liste de cartes possédées</label><select id="pokemonOwnedCategory"><option value="">Sans liste</option></select>
@@ -107,7 +110,7 @@
 						<label for="pokemonOwnedQty">Quantité possédée</label><input id="pokemonOwnedQty" type="number" min="0" max="999" value="0">
 						<label class="wanted-toggle"><input id="pokemonWanted" type="checkbox"> Je recherche cette version</label>
 						<button id="savePokemonVersion" class="primary-button full-button">Enregistrer cette version</button>
-					</div></div>
+					</div>
 					<div class="section-heading compact owned-heading"><div><p class="eyebrow">CETTE CARTE</p><h3>Mes versions enregistrées</h3></div></div>
 					<div id="selectedCardVersions" class="version-list"></div>
 					</section>
@@ -137,13 +140,19 @@
 			<input id="collectionName" maxlength="50" placeholder="Ex. Mes figurines" required>
 			<label for="collectionEmoji">Choisir un symbole</label>
 			<div id="emojiChoices" class="emoji-choices">
-				<button type="button" class="emoji-choice selected">💎</button><button type="button" class="emoji-choice">📚</button><button type="button" class="emoji-choice">🧸</button><button type="button" class="emoji-choice">🃏</button><button type="button" class="emoji-choice">🦴</button><button type="button" class="emoji-choice">🌿</button><button type="button" class="emoji-choice">🎀</button><button type="button" class="emoji-choice">✨</button><button type="button" class="emoji-choice">💵</button>
+				<button type="button" class="emoji-choice selected">💎</button><button type="button" class="emoji-choice">📚</button><button type="button" class="emoji-choice">🧸</button><button type="button" class="emoji-choice">🃏</button><button type="button" class="emoji-choice">🦴</button><button type="button" class="emoji-choice">🌿</button><button type="button" class="emoji-choice">🎀</button><button type="button" class="emoji-choice">✨</button><button type="button" class="emoji-choice">🪙</button>
 			</div>
 			<input id="collectionEmoji" type="hidden" value="💎">
 			<div class="dialog-actions"><button type="button" class="soft-button" data-close="collectionDialog">Annuler</button><button class="primary-button" type="submit">Enregistrer</button></div>
 		</form>
 	</dialog>
 
+	<dialog id="itemDetailsDialog">
+		<div class="dialog-heading"><div><p class="eyebrow">MON OBJET</p><h2 id="itemDetailsTitle">Détails</h2></div><button type="button" class="close-button" data-close="itemDetailsDialog">×</button></div>
+		<img id="itemDetailsPhoto" class="item-details-photo hidden" alt="Photo de mon objet">
+		<p id="itemDetailsNote" class="item-details-note"></p><p id="itemDetailsStatus" class="muted"></p>
+		<div class="dialog-actions"><button id="itemDetailsEdit" class="soft-button" type="button">Modifier</button><button type="button" class="primary-button" data-close="itemDetailsDialog">Fermer</button></div>
+	</dialog>
 	<dialog id="itemDialog">
 		<form id="itemForm" method="dialog">
 			<div class="dialog-heading"><div><p class="eyebrow">MA LISTE</p><h2 id="itemDialogTitle">Ajouter un élément</h2></div><button type="button" class="close-button" data-close="itemDialog">×</button></div>

@@ -100,12 +100,12 @@ function getRecord(cardId, language, variant) {
 	return pokemonRecords.find(r => recordKey(r) === recordKey({cardId, language, variant}));
 }
 function cardImage(url, quality = "low") {
-	return url ? `${url}/${quality}.png` : "./icons/pokemon-card-back.jpg";
+	return url ? `${url}/${quality}.png` : "./icons/pokemon-card-back.svg";
 }
 function applyCardImageFallback(image) {
 	image.onerror = () => {
 		image.onerror = null;
-		image.src = "./icons/pokemon-card-back.jpg";
+		image.src = "./icons/pokemon-card-back.svg";
 	};
 }
 function showPokemonDetail() {
@@ -203,15 +203,9 @@ function renderRecordList(records, emptyMessage, type = pokemonCurrentPanel) {
 	});
 	const renderGroup = group => {
 		const first = group[0];
-		const variants = group.map(record => `<div class="record-variant-line">
-			<span>${pEscape(formatVariant(record.variant))} · Qté ${Number(record.quantity) || 0}${record.wanted ? " · À trouver" : ""}</span>
-			<span class="record-variant-actions"><button class="mini-button" data-record-edit="${pEscape(recordKey(record))}" aria-label="Modifier la version">✎</button><button class="mini-button" data-record-delete="${pEscape(recordKey(record))}" aria-label="Supprimer la version">×</button></span>
-		</div>`).join("");
-		return `<article class="pokemon-record pokemon-record-group">
-			<img src="${pEscape(cardImage(first.image))}" alt="" loading="lazy" class="fallback-card-image">
-			<div class="pokemon-record-copy"><strong>${pEscape(first.name)}</strong><span>${pEscape(first.setName || "Extension inconnue")} · ${pEscape(first.localId || "?")}</span>${variants}</div>
-			<button class="mini-button record-open" data-open-record-button="${pEscape(first.cardId)}" data-record-language="${pEscape(first.language)}" aria-label="Voir la carte">›</button>
-		</article>`;
+		return `<button type="button" class="pokemon-record pokemon-record-group pokemon-record-image-only" data-open-record-button="${pEscape(first.cardId)}" data-record-language="${pEscape(first.language)}" aria-label="Voir ${pEscape(first.name)}">
+			<img src="${pEscape(cardImage(first.image))}" alt="${pEscape(first.name)}" loading="lazy" class="fallback-card-image">
+		</button>`;
 	};
 	const selectedType = type;
 	const allCategories = pokemonCategories[selectedType] || [];
@@ -240,7 +234,7 @@ function renderSelectedVersions() {
 	const box = p$("selectedCardVersions");
 	if (!box || !selectedPokemonCard) return;
 	const rows = pokemonRecords.filter(r => r.cardId === selectedPokemonCard.id && r.language === pokemonCardLanguage);
-	box.innerHTML = rows.length ? renderRecordList(rows, "", "search") : '<div class="empty-state small-empty">Aucune version enregistrée pour cette carte.</div>';
+	box.innerHTML = rows.length ? rows.map(record => `<div class="saved-version-detail"><span><strong>${pEscape(formatVariant(record.variant))}</strong><small>Quantité possédée : ${Number(record.quantity) || 0}${record.wanted ? " · Également recherchée" : ""}</small></span></div>`).join("") : '<div class="empty-state small-empty">Aucune version enregistrée pour cette carte.</div>';
 }
 function bindRecordActions(root) {
 	root.querySelectorAll("[data-record-delete]").forEach(btn => btn.addEventListener("click", () => {
@@ -261,12 +255,15 @@ function bindRecordActions(root) {
 		pokemonCurrentPanel = root.id === "pokemonWantedList" ? "wanted" : root.id === "pokemonOwnedList" ? "owned" : pokemonCurrentPanel;
 		renderPokemonRecords();
 		document.querySelectorAll("[data-language]").forEach(b => b.classList.toggle("active", b.dataset.language === pokemonLanguage));
-		selectedPokemonCard = {id:record.cardId,name:record.name,image:record.image,localId:record.localId,seriesName:record.seriesName || "",rarity:record.rarity || "",set:{id:record.setId,name:record.setName}};
+		selectedPokemonCard = {id:record.cardId,name:record.name,image:record.image,localId:record.localId,seriesName:record.seriesName || "",rarity:record.rarity || "",illustrator:record.illustrator || "",set:{id:record.setId,name:record.setName}};
 		selectedPokemonDetails = null;
 		showPokemonDetail();
 		fillPokemonCategorySelects();
 		p$("selectedCardName").textContent = record.name;
 		p$("selectedCardMeta").textContent = `${record.setName || "Extension"} · ${record.localId || ""} · ${languageNames[record.language]}`;
+		p$("selectedCardDetails").innerHTML = `<p><strong>Illustrateur :</strong> ${pEscape(record.illustrator || "Non renseigné par TCGdex")}</p><p><strong>Extension :</strong> ${pEscape(record.setName || "Inconnue")}</p><p><strong>Rareté :</strong> ${pEscape(record.rarity || "Non renseignée")}</p>`;
+		p$("pokemonAddForm").classList.remove("hidden");
+		p$("showPokemonAddForm").classList.add("hidden");
 		p$("selectedCardImage").src = cardImage(record.image, "high");
 		p$("selectedCardImage").classList.remove("hidden");
 		applyCardImageFallback(p$("selectedCardImage"));
@@ -284,7 +281,8 @@ async function searchPokemonCards() {
 	const name = p$("pokemonSearch").value.trim();
 	const set = p$("pokemonSetFilter").value.trim();
 	const number = p$("pokemonNumberFilter").value.trim();
-	if (!name && !set && !number) { pokemonToast("Indique au moins un nom, une extension ou un numéro."); return; }
+	const illustrator = p$("pokemonIllustratorFilter").value.trim();
+	if (!name && !set && !number && !illustrator) { pokemonToast("Indique au moins un nom, une extension ou un numéro."); return; }
 	const sequence = ++pokemonSearchSequence;
 	const results = p$("pokemonResults");
 	results.innerHTML = '<div class="empty-state">Recherche en cours…</div>';
@@ -294,6 +292,7 @@ async function searchPokemonCards() {
 		if (name) params.set("name", name);
 		if (set) params.set("set", set);
 		if (number) params.set("localId", number);
+		if (illustrator) params.set("illustrator", illustrator);
 		params.set("pagination:page", "1");
 		params.set("pagination:itemsPerPage", "40");
 		return `${POKEMON_API}/${language}/cards?${params.toString()}`;
@@ -318,6 +317,7 @@ async function searchPokemonCards() {
 						japaneseParams.set("name", japaneseName);
 						if (set) japaneseParams.set("set", set);
 						if (number) japaneseParams.set("localId", number);
+						if (illustrator) japaneseParams.set("illustrator", illustrator);
 						japaneseParams.set("pagination:page", "1");
 						japaneseParams.set("pagination:itemsPerPage", "40");
 						const japaneseResponse = await fetch(`${POKEMON_API}/ja/cards?${japaneseParams.toString()}`);
@@ -344,9 +344,8 @@ async function searchPokemonCards() {
 			results.innerHTML = '<div class="empty-state">Aucune carte trouvée. Essaie un nom dans la langue sélectionnée ou retire un filtre ♡</div>';
 			return;
 		}
-		results.innerHTML = cards.map(card => `<button class="pokemon-result" data-card-id="${pEscape(card.id)}" data-card-language="${resultLanguage}">
-			<img src="${pEscape(cardImage(card.image))}" alt="" loading="lazy" class="fallback-card-image">
-			<span><strong>${pEscape(card.name)}</strong><small>${pEscape(card.id)}${resultLanguage !== pokemonLanguage ? " · résultat anglais" : ""}</small></span><span class="result-arrow">›</span></button>`).join("");
+		results.innerHTML = cards.map(card => `<button type="button" class="pokemon-result pokemon-result-image-only" data-card-id="${pEscape(card.id)}" data-card-language="${resultLanguage}" aria-label="Voir ${pEscape(card.name)}">
+			<img src="${pEscape(cardImage(card.image))}" alt="${pEscape(card.name)}" loading="lazy" class="fallback-card-image"></button>`).join("");
 		results.querySelectorAll(".fallback-card-image").forEach(applyCardImageFallback);
 		results.querySelectorAll("[data-card-id]").forEach(btn => btn.addEventListener("click", () => loadPokemonCard(btn.dataset.cardId, btn.dataset.cardLanguage)));
 	} catch {
@@ -359,6 +358,9 @@ async function loadPokemonCard(cardId, language = pokemonLanguage) {
 	const results = p$("pokemonResults");
 	results.querySelectorAll(".pokemon-result").forEach(b => b.classList.toggle("selected", b.dataset.cardId === cardId));
 	showPokemonDetail();
+	p$("pokemonAddForm").classList.add("hidden");
+	p$("showPokemonAddForm").classList.remove("hidden");
+	p$("selectedCardDetails").textContent = "";
 	p$("selectedCardName").textContent = "Chargement de la carte…";
 	pokemonCardLanguage = language;
 	try {
@@ -376,6 +378,9 @@ async function loadPokemonCard(cardId, language = pokemonLanguage) {
 		selectedPokemonDetails = card;
 		p$("selectedCardName").textContent = card.name;
 		p$("selectedCardMeta").textContent = `${card.set?.name || "Extension inconnue"} · N° ${card.localId || "?"} · ${card.rarity || "Rareté non renseignée"} · ${languageNames[pokemonCardLanguage] || pokemonCardLanguage}`;
+		p$("selectedCardDetails").innerHTML = `<p><strong>Illustrateur :</strong> ${pEscape(card.illustrator || "Non renseigné par TCGdex")}</p><p><strong>Type :</strong> ${pEscape(card.types?.join(", ") || "Non renseigné")}</p><p><strong>Rareté :</strong> ${pEscape(card.rarity || "Non renseignée")}</p><p><strong>Extension :</strong> ${pEscape(card.set?.name || "Inconnue")}</p>`;
+		p$("pokemonAddForm").classList.add("hidden");
+		p$("showPokemonAddForm").classList.remove("hidden");
 		const image = p$("selectedCardImage");
 		image.src = cardImage(card.image, "high");
 		image.classList.remove("hidden");
@@ -419,7 +424,7 @@ function saveSelectedPokemonVersion() {
 		cardId:selectedPokemonCard.id, name:selectedPokemonCard.name, image:selectedPokemonCard.image || "",
 		localId:String(selectedPokemonCard.localId || ""), setName:selectedPokemonCard.set?.name || "",
 		seriesName:selectedPokemonCard.seriesName || selectedPokemonCard.set?.serie?.name || "",
-		setId:selectedPokemonCard.set?.id || "", rarity:selectedPokemonCard.rarity || "", language:pokemonCardLanguage,
+		setId:selectedPokemonCard.set?.id || "", rarity:selectedPokemonCard.rarity || "", illustrator:selectedPokemonCard.illustrator || "", language:pokemonCardLanguage,
 		variant, quantity, wanted,
 		ownedCategoryId:p$("pokemonOwnedCategory").value || "",
 		wantedCategoryId:p$("pokemonWantedCategory").value || ""
@@ -486,6 +491,7 @@ document.querySelectorAll("[data-language]").forEach(btn => btn.addEventListener
 p$("closeSelectedCard").addEventListener("click", hidePokemonDetail);
 p$("pokemonDetailBack").addEventListener("click", hidePokemonDetail);
 p$("savePokemonVersion").addEventListener("click", saveSelectedPokemonVersion);
+p$("showPokemonAddForm").addEventListener("click", () => { p$("pokemonAddForm").classList.remove("hidden"); p$("showPokemonAddForm").classList.add("hidden"); });
 p$("pokemonVariant").addEventListener("change", () => {
 	if (!selectedPokemonCard) return;
 	const existing = getRecord(selectedPokemonCard.id,pokemonCardLanguage,p$("pokemonVariant").value);
